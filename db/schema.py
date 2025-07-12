@@ -1,20 +1,20 @@
 import psycopg2
 from config.settings import PG_CONFIG
 
-def create_table_if_not_exists(symbol: str, interval: str = "1m"):
-    if symbol.upper() == "BTCUSDT" and interval == "1m":
-        table_name = "btc_ohlcv_minute"
-    else:
-        table_name = f"{symbol.lower()}_ohlcv_{interval}"
-    
+def create_table_if_not_exists(symbol: str):
+    """
+    Create the per-symbol table public.ohlcv_<symbol_lowercase>
+    with `time` as the PRIMARY KEY.
+    """
+    table_name = f"public.ohlcv_{symbol.lower()}"
     create_sql = f"""
     CREATE TABLE IF NOT EXISTS {table_name} (
-        timestamp TIMESTAMPTZ PRIMARY KEY,
-        open DOUBLE PRECISION,
-        high DOUBLE PRECISION,
-        low DOUBLE PRECISION,
-        close DOUBLE PRECISION,
-        volume DOUBLE PRECISION
+        time    TIMESTAMPTZ PRIMARY KEY,
+        open    NUMERIC    NOT NULL,
+        high    NUMERIC    NOT NULL,
+        low     NUMERIC    NOT NULL,
+        close   NUMERIC    NOT NULL,
+        volume  NUMERIC    NOT NULL
     );
     """
     with psycopg2.connect(**PG_CONFIG) as conn:

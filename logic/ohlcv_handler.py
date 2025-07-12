@@ -1,53 +1,91 @@
 import logging
 from datetime import datetime, timedelta
-from tqdm import tqdm
+import psycopg2
 
-from config.settings import DEFAULT_LIMIT, DEFAULT_INTERVAL, TIMEZONE, END_DATE, START_DATE
 from fetcher.binance import fetch_binance_ohlcv
-from db.schema import create_table_if_not_exists
+from db.schema     import create_table_if_not_exists
 from db.operations import save_ohlcv
-import yaml
+from config.settings import PG_CONFIG
 
-def load_symbols(path: str = "./symbols.yml") -> list:
-    with open(path, "r") as f:
-        raw = yaml.safe_load(f)
+# Chunk size for each fetch iteration
+CHUNK_SIZE = timedelta(days=1)
+# OHLCV interval
+INTERVAL   = "1m"
 
-    # If file uses dictionary style: symbols: [btc, eth, ...]
-    if isinstance(raw, dict) and "symbols" in raw:
-        symbols = raw["symbols"]
-    elif isinstance(raw, list):
-        symbols = raw
-    else:
-        raise ValueError("❌ Invalid symbols.yml format")
+def load_symbols_from_db() -> list[str]:
+    """
+    Fetch list of symbols (e.g. ['BTCUSDT','ETHUSDT',...]) from public.symbols.
+    """
+    with psycopg2.connect(**PG_CONFIG) as conn, conn.cursor() as cur:
+        cur.execute("SELECT symbol FROM public.symbols;")
+        return [row[0] for row in cur.fetchall()]
 
-    # Convert to BINANCE format
-    return [symbol.upper() + "USDT" for symbol in symbols]
-def run_full_fetch(start=START_DATE, end=None):
-    end = datetime.now(TIMEZONE) if end is None else datetime.fromisoformat(end)
-    symbols = load_symbols()
-    interval = DEFAULT_INTERVAL
 
+def get_last_timestamp(symbol: str) -> datetime | None:
+    """
+    Returns the latest `time` value already in public.ohlcv_<symbol> table,
+    or None if table is empty.
+    """
+    table = f"public.ohlcv_{symbol.lower()}"
+    query = f"SELECT MAX(time) FROM {table};"
+    with psycopg2.connect(**PG_CONFIG) as conn, conn.cursor() as cur:
+        cur.execute(query)
+        result = cur.fetchone()[0]
+        return result
+
+
+def run_full_fetch(start: str, end: str):
+    """
+    Fetch OHLCV data from `start` to `end` for each symbol,
+    auto-creating tables, skipping already-fetched periods.
+    """
+    start_dt = datetime.fromisoformat(start)
+    end_dt   = datetime.fromisoformat(end)
+
+    symbols = load_symbols_from_db()
     for symbol in symbols:
-        logging.info(f"▶️ Fetching {symbol} from {start} to {end}")
-        create_table_if_not_exists(symbol, interval)
-        
-        current = datetime.fromisoformat(start) if isinstance(start, str) else start
-        total_minutes = int((end - current).total_seconds() // 60)
-        total_chunks = total_minutes // DEFAULT_LIMIT + 1
+        # Ensure per-symbol table exists
+        create_table_if_not_exists(symbol)
 
-        with tqdm(total=total_chunks, desc=f"{symbol}") as pbar:
-            while current < end:
-                chunk_end = min(current + timedelta(minutes=DEFAULT_LIMIT), end)
-                try:
-                    ohlcv = fetch_binance_ohlcv(symbol, interval, current, chunk_end)
-                    if ohlcv:
-                        save_ohlcv(symbol, interval, ohlcv)
-                        logging.info(f"✅ {symbol}: {len(ohlcv)} rows saved from {current} to {chunk_end}")
-                    else:
-                        logging.warning(f"⚠️ {symbol}: No data {current} → {chunk_end}")
-                except Exception as e:
-                    logging.error(f"❌ {symbol}: Error from {current} to {chunk_end}: {e}")
+        # Determine where to start: max of provided start and DB's last timestamp + 1 minute
+        last_ts = get_last_timestamp(symbol)
+        if last_ts:
+            # avoid overlap: start one minute after last stored
+            db_start = last_ts + timedelta(minutes=1)
+            current = max(start_dt, db_start)
+        else:
+            current = start_dt
+
+        if current >= end_dt:
+            logging.info(f"[SKIP] {symbol} up to date (last: {last_ts})")
+            continue
+
+        while current < end_dt:
+            chunk_end = min(end_dt, current + CHUNK_SIZE)
+
+            # Fetch a chunk of data
+            try:
+                rows = fetch_binance_ohlcv(symbol, INTERVAL, current, chunk_end)
+            except Exception as e:
+                logging.error(f"[ERROR] Fetch error for {symbol} from {current} to {chunk_end}: {e}")
+                break
+
+            if not rows:
+                logging.info(f"[WARN] No rows for {symbol} between {current} and {chunk_end}")
                 current = chunk_end
-                pbar.update(1)
+                continue
 
-    logging.info("🎉 All symbols fetched.")
+            # Save fetched rows into the DB
+            save_ohlcv(symbol, INTERVAL, rows)
+            logging.info(f"[SAVE] {symbol}: {len(rows)} rows from {current} to {chunk_end}")
+
+            # Determine last timestamp and advance to avoid overlap
+            raw_ts = rows[-1][0]
+            if isinstance(raw_ts, str):
+                last_fetched = datetime.fromisoformat(raw_ts)
+            else:
+                last_fetched = raw_ts
+
+            current = last_fetched + timedelta(minutes=1)
+
+    logging.info("🎉 All symbols backfilled.")
