@@ -1,0 +1,23 @@
+# Core packages
+requests==2.31.0
+pandas==2.1.4                       # downgraded for easier install on Windows
+python-dateutil==2.8.2
+
+# Logging and utilities
+loguru==0.7.2
+tqdm==4.66.4
+pyyaml==6.0.1
+
+# Database
+psycopg2-binary==2.9.9
+sqlalchemy==2.0.30
+
+# Time zone aware datetime
+pytz==2024.1
+
+# Optional (for backtesting or technical indicators)
+ta==0.10.2                          # Technical Analysis library
+matplotlib==3.8.4                   # If you want to visualize data
+
+# Environment management (optional)
+python-dotenv==1.0.1
