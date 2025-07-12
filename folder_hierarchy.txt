@@ -1,0 +1,41 @@
+%devs%\Projects\crypto\barinex
+< barinex >
+|    |-- .gitignore
+|    |-- README.md
+|    |-- clear_logs.bat
+|-- config/
+   |-- __pycache__/
+      |    |-- settings.cpython-311.pyc
+      |    |-- settings.cpython-313.pyc
+   |    |-- settings.py
+|-- db/
+   |-- __pycache__/
+      |    |-- operations.cpython-311.pyc
+      |    |-- operations.cpython-313.pyc
+      |    |-- schema.cpython-311.pyc
+      |    |-- schema.cpython-313.pyc
+   |    |-- operations.py
+   |    |-- schema.py
+|-- docs/
+   |    |-- structure.md
+|    |-- fetch_all.py
+|    |-- fetch_binance_ohlcv.py
+|-- fetcher/
+   |-- __pycache__/
+      |    |-- binance.cpython-311.pyc
+      |    |-- binance.cpython-313.pyc
+   |    |-- binance.py
+|    |-- folder_hierarchy.txt
+|-- logic/
+   |-- __pycache__/
+      |    |-- checker.cpython-313.pyc
+      |    |-- ohlcv_handler.cpython-311.pyc
+      |    |-- ohlcv_handler.cpython-313.pyc
+   |    |-- checker.py
+   |    |-- ohlcv_handler.py
+|-- logs/
+   |    |-- batch_fetch.log
+|    |-- mapper.ini
+|    |-- requirements.txt
+|    |-- setup.bat
+|    |-- symbols.yml
