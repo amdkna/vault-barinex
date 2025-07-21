@@ -18,6 +18,7 @@
    |    |-- operations.py
    |    |-- schema.py
 |-- docs/
+   |    |-- README_ohlcv_fetcher.md
    |    |-- first_data_finder.md
    |    |-- structure.md
 |    |-- fetch_all.py
@@ -27,23 +28,27 @@
       |    |-- binance.cpython-311.pyc
       |    |-- binance.cpython-313.pyc
    |    |-- binance.py
-   |-- logs/
+   |    |-- last_fetch.json
    |    |-- ohlcv_data_fetcher.py
 |    |-- folder_hierarchy.txt
+|-- indicators/
+   |    |-- rsi.py
 |-- logic/
    |-- __pycache__/
       |    |-- checker.cpython-313.pyc
       |    |-- ohlcv_handler.cpython-311.pyc
       |    |-- ohlcv_handler.cpython-313.pyc
-   |    |-- checker.py
+   |    |-- indicator_evaluator.py
    |    |-- ohlcv_handler.py
 |-- logs/
    |    |-- ohlcv_backfill.log
 |    |-- mapper.ini
 |    |-- requirements.txt
 |-- scripts/
+   |    |-- evaluate_indicators_at.py
    |    |-- first_data_finder.py
 |    |-- setup.bat
 |    |-- symbols.yml
 |-- test_scripts/
+   |    |-- checker.py
    |    |-- find_first_available_btc_data.py

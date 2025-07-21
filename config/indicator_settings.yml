@@ -1,0 +1,8 @@
+# indicator_settings.yml
+# ─────────────────────────────────────────────────────────────
+# This file configures the timeframe used when calculating indicators.
+# Valid options: 1m, 5m, 15m, 30m, 1h, 4h, d, w
+# (meaning: 1 minute, 5 minutes, 1 hour, 1 day, etc.)
+# ─────────────────────────────────────────────────────────────
+
+timeframe: 1h  # Set the desired candle timeframe here
