@@ -1,10 +1,11 @@
-import os
-import requests
-import psycopg2
 import logging
-from tqdm import tqdm
-from dotenv import load_dotenv
+import os
 from datetime import datetime, timedelta, timezone
+
+import psycopg2
+import requests
+from dotenv import load_dotenv
+from tqdm import tqdm
 
 # --- Setup Logging ---
 logging.basicConfig(

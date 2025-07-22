@@ -1,6 +1,9 @@
-import requests
 from datetime import datetime, timezone
+
+import requests
+
 from config.settings import BINANCE_API_URL, DEFAULT_LIMIT
+
 
 def fetch_binance_ohlcv(symbol: str, interval: str, start_ts, end_ts, limit=DEFAULT_LIMIT):
     params = {

@@ -1,7 +1,10 @@
+import logging
+
 import pandas as pd
 import psycopg2
+
 from config.settings import PG_CONFIG
-import logging
+
 
 def get_ohlcv_data(symbol: str, start, end) -> pd.DataFrame:
     table_name = f"ohlcv_{symbol.lower()}"

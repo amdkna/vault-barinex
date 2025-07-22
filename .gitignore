@@ -1,53 +1,61 @@
-# ─── Python cache & artifacts ──────────────────────────────────────────────────
+# Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
-*$py.class
 *.so
 
-# ─── Build / distribution ──────────────────────────────────────────────────────
-build/
-dist/
-pip-wheel-metadata/
+# C extensions
 *.egg
 *.egg-info/
 
-# ─── Test / coverage ───────────────────────────────────────────────────────────
+# Distribution / packaging
+dist/
+build/
+pip-wheel-metadata/
+
+# Testing caches
 *.pytest_cache/
 htmlcov/
 coverage.xml
 reports/
+
+# Mypy cache
 .mypy_cache/
+
+# General cache
 .cache/
 
-# ─── Virtual environments ───────────────────────────────────────────────────────
+# Virtual environments
 env/
 venv/
 .venv/
 ENV/
-__pypackages__/
 
-# ─── IDEs & editors ────────────────────────────────────────────────────────────
+# Editor directories and files
 .vscode/
 .idea/
-*.sublime-*
 *.swp
 *.swo
+*.sublime-*
 
-# ─── Environment & secret files ────────────────────────────────────────────────
+# Environment variables
 .env
 .env.*
-*.pem
-*.key
-*.crt
+# pipenv / poetry lockfiles
+Pipfile.lock
+poetry.lock
 
-# ─── OS artifacts ──────────────────────────────────────────────────────────────
+# OS-generated files
 .DS_Store
 Thumbs.db
 desktop.ini
 
-# ─── Logs ──────────────────────────────────────────────────────────────────────
+# Logs
 *.log
 
-# ─── Lockfiles ─────────────────────────────────────────────────────────────────
-poetry.lock
-Pipfile.lock
+# Secrets & certificates
+*.pem
+*.key
+*.crt
+
+# __pypackages__ (PEP 582)
+__pypackages__/

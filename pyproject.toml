@@ -4,37 +4,51 @@ build-backend = "setuptools.build_meta"
 
 [tool.black]
 line-length = 88
-target-version = ['py38']
+target-version = ["py38"]
 exclude = '''
 /(
     env-barinex
-  | env
   | venv
   | \.venv
   | build
   | dist
+  | scripts
+  | fetcher
+  | db
+  | indicators
+  | logic
+  | test_scripts
+  | folder_hierarchy\.txt
+  | mapper\.ini
+  | \.github
 )/
+'''
 
 [tool.isort]
 profile = "black"
 
 [tool.flake8]
 max-line-length = 88
-extend-ignore = "E203"
+extend-ignore = ["E203"]
+exclude = [
+  "env-barinex",
+  "venv",
+  ".venv",
+  "build",
+  "dist",
+  "scripts",
+  "fetcher",
+  "db",
+  "indicators",
+  "logic",
+  "test_scripts",
+  "folder_hierarchy.txt",
+  "mapper.ini",
+  ".github"
+]
 
 [tool.mypy]
-python_version = 3.8
+python_version = "3.8"
 strict = true
-
-[project]               # or [tool.poetry] if you’re using Poetry
-name        = "barinex"
-version     = "0.1.0"
-description = "A CLI tool and library for crypto OHLCV fetching and indicator computation"
-authors     = ["Arash <you@example.com>"]
-license     = { file = "LICENSE.md" }
-readme      = "README.md"
-classifiers = [
-  "Programming Language :: Python :: 3",
-  "License :: OSI Approved :: MIT License",
-  "Operating System :: OS Independent",
-]
+ignore_missing_imports = true
+exclude = '^(scripts|fetcher|db|indicators|logic|test_scripts)/'

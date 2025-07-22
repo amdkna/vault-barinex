@@ -5,9 +5,10 @@ find_first_available_btc_data.py
 Binary-search the first 1m OHLCV bar for BTCUSDT on Binance.
 """
 
-import requests
 import datetime
 import sys
+
+import requests
 
 API_URL  = "https://api.binance.com/api/v3/klines"
 SYMBOL   = "BTCUSDT"

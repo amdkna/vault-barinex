@@ -7,14 +7,15 @@ in config/symbols.yml, saving results into the `symbols` table.
 Handles permission errors by printing guidance on granting privileges.
 """
 
+import datetime
 import os
 import sys
 import time
-import datetime
-import yaml
-import requests
+
 import psycopg2
-from psycopg2 import sql, errors
+import requests
+import yaml
+from psycopg2 import errors, sql
 
 # ─── Make project root importable ──────────────────────────────────────────────
 BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir))
@@ -22,7 +23,7 @@ if BASE_DIR not in sys.path:
     sys.path.insert(0, BASE_DIR)
 # ──────────────────────────────────────────────────────────────────────────────
 
-from config.settings import PG_CONFIG, BINANCE_API_URL, DEFAULT_INTERVAL
+from config.settings import BINANCE_API_URL, DEFAULT_INTERVAL, PG_CONFIG
 
 # Parameters
 TIMEOUT = 5  # seconds per HTTP request

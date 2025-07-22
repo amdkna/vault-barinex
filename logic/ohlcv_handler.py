@@ -1,11 +1,12 @@
 import logging
 from datetime import datetime, timedelta
+
 import psycopg2
 
-from fetcher.binance import fetch_binance_ohlcv
-from db.schema     import create_table_if_not_exists
-from db.operations import save_ohlcv
 from config.settings import PG_CONFIG
+from db.operations import save_ohlcv
+from db.schema import create_table_if_not_exists
+from fetcher.binance import fetch_binance_ohlcv
 
 # Chunk size for each fetch iteration
 CHUNK_SIZE = timedelta(days=1)

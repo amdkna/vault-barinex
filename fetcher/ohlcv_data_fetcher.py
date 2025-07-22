@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
+import json
 import logging
 import os
 import sys
-import json
 from datetime import datetime, timezone
 from time import sleep
 
@@ -20,9 +20,10 @@ if BASE_DIR not in sys.path:
     sys.path.insert(0, BASE_DIR)
 # ──────────────────────────────────────────────────────────────────────────────
 
-from config.settings import PG_CONFIG
 import psycopg2
+
 import logic.ohlcv_handler as handler  # use handler.run_full_fetch
+from config.settings import PG_CONFIG
 
 # --- Logging Setup: Console + File with Unicode fallback ---
 LOG_DIR = os.path.join(BASE_DIR, "logs")

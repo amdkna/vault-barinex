@@ -1,4 +1,5 @@
-from indicators import rsi, macd, adx
+from indicators import adx, macd, rsi
+
 
 def evaluate_indicators(df):
     results = {}

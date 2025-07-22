@@ -1,6 +1,7 @@
 import os
-from dotenv import load_dotenv
 from datetime import timezone
+
+from dotenv import load_dotenv
 
 # Load .env file
 load_dotenv()

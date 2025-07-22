@@ -13,8 +13,9 @@ if BASE_DIR not in sys.path:
     sys.path.insert(0, BASE_DIR)
 # ──────────────────────────────────────────────────────────────────────────────
 
-from config.settings import PG_CONFIG
 import psycopg2
+
+from config.settings import PG_CONFIG
 
 
 def create_tables():

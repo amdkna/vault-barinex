@@ -1,20 +1,24 @@
 repos:
   - repo: https://github.com/psf/black
-    rev: 23.1.0         # a real Black release
+    rev: 23.1.0
     hooks:
       - id: black
+        files: ^(pyproject\.toml|\.pre-commit-config\.yaml|\.editorconfig|\.gitignore)$
 
   - repo: https://github.com/PyCQA/isort
-    rev: 5.12.0         # match your installed version
+    rev: 5.12.0
     hooks:
       - id: isort
+        files: ^(pyproject\.toml|\.pre-commit-config\.yaml)$
 
-  - repo: https://github.com/pycqa/flake8   # switch to the GitHub mirror
+  - repo: https://github.com/pycqa/flake8
     rev: 6.0.0
     hooks:
       - id: flake8
+        files: ^(pyproject\.toml|\.pre-commit-config\.yaml)$
 
   - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v0.971         # your mypy version
+    rev: v0.971
     hooks:
       - id: mypy
+        files: ^(pyproject\.toml|\.pre-commit-config\.yaml)$

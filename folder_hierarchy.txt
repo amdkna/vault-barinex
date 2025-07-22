@@ -6,6 +6,7 @@
    |-- __pycache__/
       |    |-- settings.cpython-311.pyc
       |    |-- settings.cpython-313.pyc
+   |    |-- indicator_settings.yml
    |    |-- settings.py
    |    |-- symbols.yml
 |-- db/
@@ -20,6 +21,7 @@
 |-- docs/
    |    |-- README_ohlcv_fetcher.md
    |    |-- first_data_finder.md
+   |    |-- indicator_evaluator_doc.md
    |    |-- structure.md
 |    |-- fetch_all.py
 |    |-- fetch_binance_ohlcv.py
@@ -32,17 +34,23 @@
    |    |-- ohlcv_data_fetcher.py
 |    |-- folder_hierarchy.txt
 |-- indicators/
+   |-- __pycache__/
+      |    |-- adx.cpython-311.pyc
+      |    |-- macd.cpython-311.pyc
+      |    |-- rsi.cpython-311.pyc
+   |    |-- adx.py
+   |    |-- macd.py
    |    |-- rsi.py
 |-- logic/
    |-- __pycache__/
       |    |-- checker.cpython-313.pyc
+      |    |-- indicator_evaluator.cpython-311.pyc
       |    |-- ohlcv_handler.cpython-311.pyc
       |    |-- ohlcv_handler.cpython-313.pyc
    |    |-- indicator_evaluator.py
    |    |-- ohlcv_handler.py
 |-- logs/
    |    |-- ohlcv_backfill.log
-|    |-- mapper.ini
 |    |-- requirements.txt
 |-- scripts/
    |    |-- evaluate_indicators_at.py

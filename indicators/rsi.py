@@ -1,5 +1,6 @@
 from ta.momentum import RSIIndicator
 
+
 def calculate_rsi(df, period=14):
     if len(df) < period:
         return float("nan")

@@ -1,5 +1,7 @@
 import psycopg2
+
 from config.settings import PG_CONFIG
+
 
 def create_table_if_not_exists(symbol: str):
     """

@@ -1,9 +1,12 @@
 from datetime import timedelta
+
 import psycopg2
-from config.settings import PG_CONFIG, DEFAULT_INTERVAL
-from fetcher.binance import fetch_binance_ohlcv
+
+from config.settings import DEFAULT_INTERVAL, PG_CONFIG
 from db.operations import save_ohlcv
 from db.schema import create_table_if_not_exists
+from fetcher.binance import fetch_binance_ohlcv
+
 
 def fill_missing(symbol: str, interval: str = DEFAULT_INTERVAL):
     create_table_if_not_exists(symbol, interval)  # 🔧 Ensure table exists

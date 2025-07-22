@@ -1,5 +1,6 @@
 from ta.trend import ADXIndicator
 
+
 def calculate_adx(df, period=14):
     if len(df) < period:
         return float("nan")
