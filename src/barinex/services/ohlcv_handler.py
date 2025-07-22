@@ -1,5 +1,3 @@
-# src/barinex/services/ohlcv_handler.py
-
 from __future__ import annotations
 
 import logging
@@ -18,7 +16,7 @@ logger = logging.getLogger(__name__)
 
 # How much history to pull per request
 CHUNK_SIZE = timedelta(days=1)
-DEFAULT_INTERVAL = "1m"
+DEFAULT_INTERVAL = settings.default_interval  # e.g. "1m"
 
 
 def load_symbols_from_db() -> List[str]:
@@ -37,8 +35,8 @@ def load_symbols_from_db() -> List[str]:
             with conn.cursor() as cur:
                 cur.execute(sql)
                 return [row[0] for row in cur.fetchall()]
-    except Exception as e:
-        logger.error(f"[DB] Unable to load symbols: {e}")
+    except Exception as exc:
+        logger.error(f"[DB] Unable to load symbols: {exc}")
         raise
 
 
@@ -59,63 +57,75 @@ def get_last_timestamp(symbol: str) -> Optional[datetime]:
             with conn.cursor() as cur:
                 cur.execute(sql)
                 return cur.fetchone()[0]
-    except Exception as e:
-        logger.error(f"[DB] Error fetching last timestamp for {symbol}: {e}")
+    except Exception as exc:
+        logger.error(f"[DB] Error fetching last timestamp for {symbol}: {exc}")
         raise
 
 
-def run_full_fetch(start: str, end: str, symbols: Optional[List[str]] = None) -> None:
+def run_full_fetch(
+    symbol: str,
+    start: str,
+    end: str,
+    symbols: Optional[List[str]] = None
+) -> List[tuple]:
     """
-    Fetch OHLCV for each symbol between ISO `start` and `end`, in daily chunks.
+    Fetch OHLCV for `symbol` between ISO `start` and `end`, in daily chunks.
+    Returns the list of rows fetched (for the last chunk).
 
     Args:
-        start: ISO-formatted start datetime.
-        end:   ISO-formatted end datetime.
-        symbols: optional list of symbols; if None, all from DB.
+        symbol: Trading symbol to fetch (e.g. 'BTCUSDT').
+        start: ISO-formatted start datetime string.
+        end:   ISO-formatted end datetime string.
+        symbols: ignored (present for backward compatibility).
 
     Side-effects:
-        - Ensures each table exists
-        - Inserts any missing candles
+        - Ensures the table exists.
+        - Inserts any missing candles.
     """
     start_dt = datetime.fromisoformat(start)
     end_dt = datetime.fromisoformat(end)
-    symbols = symbols or load_symbols_from_db()
+    all_rows: List[tuple] = []
 
-    for symbol in symbols:
-        create_table_if_not_exists(symbol)
+    # Always fetch only the one symbol passed in
+    syms = [symbol]
 
-        last_ts = get_last_timestamp(symbol)
-        if last_ts:
-            cursor = max(start_dt, last_ts + timedelta(minutes=1))
-        else:
-            cursor = start_dt
+    for sym in syms:
+        create_table_if_not_exists(sym)
+
+        last_ts = get_last_timestamp(sym)
+        cursor = (
+            max(start_dt, last_ts + timedelta(minutes=1))
+            if last_ts
+            else start_dt
+        )
 
         if cursor >= end_dt:
-            logger.info(f"[SKIP] {symbol} up to date (last: {last_ts})")
+            logger.info(f"[SKIP] {sym} up to date (last: {last_ts})")
             continue
 
         while cursor < end_dt:
             chunk_end = min(end_dt, cursor + CHUNK_SIZE)
             try:
-                rows = fetch_binance_ohlcv(symbol, DEFAULT_INTERVAL, cursor, chunk_end)
-            except Exception as e:
-                logger.error(f"[ERROR] Fetch {symbol} {cursor}→{chunk_end}: {e}")
+                rows = fetch_binance_ohlcv(sym, DEFAULT_INTERVAL, cursor, chunk_end)
+            except Exception as exc:
+                logger.error(f"[ERROR] Fetch {sym} {cursor}→{chunk_end}: {exc}")
                 break
 
             if not rows:
-                logger.info(f"[WARN] No rows for {symbol} {cursor}→{chunk_end}")
+                logger.warning(f"[WARN] No rows for {sym} {cursor}→{chunk_end}")
                 cursor = chunk_end
                 continue
 
-            save_ohlcv(symbol, rows)
-            logger.info(f"[SAVE] {symbol}: {len(rows)} rows {cursor}→{chunk_end}")
+            save_ohlcv(sym, rows)
+            logger.info(f"[SAVE] {sym}: {len(rows)} rows {cursor}→{chunk_end}")
+            all_rows.extend(rows)
 
-            # Advance to one minute past the last timestamp fetched
-            last_ts_val = rows[-1][0]
+            # Advance past the last timestamp fetched
+            last_time = rows[-1][0]
             cursor = (
-                datetime.fromisoformat(last_ts_val)
-                if isinstance(last_ts_val, str)
-                else last_ts_val
+                datetime.fromisoformat(last_time)
+                if isinstance(last_time, str)
+                else last_time
             ) + timedelta(minutes=1)
 
-    logger.info("🎉 All symbols backfilled.")
+    return all_rows
