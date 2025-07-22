@@ -5,7 +5,9 @@ import requests
 from config.settings import BINANCE_API_URL, DEFAULT_LIMIT
 
 
-def fetch_binance_ohlcv(symbol: str, interval: str, start_ts, end_ts, limit=DEFAULT_LIMIT):
+def fetch_binance_ohlcv(
+    symbol: str, interval: str, start_ts, end_ts, limit=DEFAULT_LIMIT
+):
     params = {
         "symbol": symbol.upper(),
         "interval": interval,
@@ -21,6 +23,8 @@ def fetch_binance_ohlcv(symbol: str, interval: str, start_ts, end_ts, limit=DEFA
     ohlcv = []
     for row in data:
         ts = datetime.fromtimestamp(row[0] / 1000, tz=timezone.utc)
-        open_, high, low, close, volume = map(float, [row[1], row[2], row[3], row[4], row[5]])
+        open_, high, low, close, volume = map(
+            float, [row[1], row[2], row[3], row[4], row[5]]
+        )
         ohlcv.append((ts, open_, high, low, close, volume))
     return ohlcv

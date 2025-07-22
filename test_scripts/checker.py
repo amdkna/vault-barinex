@@ -27,6 +27,7 @@ def get_existing_timestamps(symbol: str, interval: str = DEFAULT_INTERVAL) -> li
             cur.execute(sql)
             return [row[0] for row in cur.fetchall()]
 
+
 def find_missing_timestamps(timestamps: list, step_minutes: int = 1) -> list:
     if not timestamps:
         return []
@@ -39,6 +40,7 @@ def find_missing_timestamps(timestamps: list, step_minutes: int = 1) -> list:
             missing.append(expected)
         expected = ts
     return missing
+
 
 def fill_missing(symbol: str, interval: str = DEFAULT_INTERVAL):
     timestamps = get_existing_timestamps(symbol, interval)

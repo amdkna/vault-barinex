@@ -10,14 +10,17 @@ import sys
 
 import requests
 
-API_URL  = "https://api.binance.com/api/v3/klines"
-SYMBOL   = "BTCUSDT"
+API_URL = "https://api.binance.com/api/v3/klines"
+SYMBOL = "BTCUSDT"
 INTERVAL = "1m"
-TIMEOUT  = 5  # seconds per request
+TIMEOUT = 5  # seconds per request
+
 
 def has_data_for_day(date: datetime.date) -> bool:
     """Return True if any 1m bar exists on `date`."""
-    day_start = datetime.datetime(date.year, date.month, date.day, tzinfo=datetime.timezone.utc)
+    day_start = datetime.datetime(
+        date.year, date.month, date.day, tzinfo=datetime.timezone.utc
+    )
     params = {
         "symbol": SYMBOL,
         "interval": INTERVAL,
@@ -27,6 +30,7 @@ def has_data_for_day(date: datetime.date) -> bool:
     r = requests.get(API_URL, params=params, timeout=TIMEOUT)
     r.raise_for_status()
     return bool(r.json())
+
 
 def find_first_day(start: datetime.date, end: datetime.date) -> datetime.date:
     """Binary-search the earliest date in [start…end] with data."""
@@ -41,16 +45,18 @@ def find_first_day(start: datetime.date, end: datetime.date) -> datetime.date:
             low = mid + 1
     return start + datetime.timedelta(days=low)
 
+
 def main():
-    guess = datetime.date(2017, 1, 1)                       # starting point
-    today = datetime.datetime.utcnow().date()              # Binance uses UTC timestamps
+    guess = datetime.date(2017, 1, 1)  # starting point
+    today = datetime.datetime.utcnow().date()  # Binance uses UTC timestamps
 
     first_day = find_first_day(guess, today)
     print(f"▶ First day with any data: {first_day.isoformat()}")
 
     # fetch the very first bar on that day
-    day_start = datetime.datetime(first_day.year, first_day.month, first_day.day,
-                                  tzinfo=datetime.timezone.utc)
+    day_start = datetime.datetime(
+        first_day.year, first_day.month, first_day.day, tzinfo=datetime.timezone.utc
+    )
     params = {
         "symbol": SYMBOL,
         "interval": INTERVAL,
@@ -62,6 +68,7 @@ def main():
     bar = r.json()[0]
     ts = datetime.datetime.fromtimestamp(bar[0] / 1000, tz=datetime.timezone.utc)
     print(f"▶ First bar timestamp: {ts.isoformat()}")
+
 
 if __name__ == "__main__":
     main()

@@ -1,0 +1,11 @@
+pip install pre-commit
+
+# install pre-commit hooks into Git
+pre-commit install
+
+# verify they're working
+pre-commit run --all-files
+
+# add and commit
+git add .pre-commit-config.yaml
+git commit -m "chore: add pre-commit config for black, isort, flake8, mypy"

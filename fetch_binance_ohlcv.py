@@ -1,99 +1,123 @@
+from __future__ import annotations
+
+import json
 import logging
-import os
-from datetime import datetime, timedelta, timezone
+from functools import wraps
+from pathlib import Path
+from time import sleep
+from datetime import datetime, timezone
+from typing import Any, Dict, List
 
 import psycopg2
-import requests
-from dotenv import load_dotenv
-from tqdm import tqdm
 
-# --- Setup Logging ---
-logging.basicConfig(
-    filename='ohlcv_fetcher.log',
-    filemode='a',
-    format='%(asctime)s | %(levelname)s | %(message)s',
-    level=logging.INFO
-)
-console = logging.StreamHandler()
-console.setLevel(logging.INFO)
-formatter = logging.Formatter('%(asctime)s | %(levelname)s | %(message)s')
-console.setFormatter(formatter)
-logging.getLogger().addHandler(console)
+from barinex.config.settings import settings
+from barinex.exceptions import FetchError, DatabaseError
+from barinex.services.ohlcv_handler import run_full_fetch
+from barinex.db.operations import save_ohlcv
 
-# --- Configs ---
-load_dotenv()
-PG_CONFIG = {
-    "host": os.getenv("PG_HOST"),
-    "port": os.getenv("PG_PORT"),
-    "database": os.getenv("PG_DB"),
-    "user": os.getenv("PG_USER"),
-    "password": os.getenv("PG_PASSWORD"),
-}
-BINANCE_API = "https://api.binance.com/api/v3/klines"
-SYMBOL = "BTCUSDT"
-INTERVAL = "1m"
-LIMIT = 1000  # Max per Binance API call
+logger = logging.getLogger(__name__)
+PROJECT_ROOT = Path(__file__).resolve().parents[3]
+STATE_FILE = PROJECT_ROOT / "fetcher" / "last_fetch.json"
 
-START_DATE = datetime(2024, 1, 1, tzinfo=timezone.utc)
-END_DATE = datetime.now(timezone.utc)
 
-# --- DB Functions ---
-def get_db_conn():
-    return psycopg2.connect(**PG_CONFIG)
-
-def save_ohlcv_to_db(ohlcv):
-    insert_sql = """
-    INSERT INTO btc_ohlcv_minute (timestamp, open, high, low, close, volume)
-    VALUES (%s, %s, %s, %s, %s, %s)
-    ON CONFLICT (timestamp) DO NOTHING;
+def retry_forever(interval: int = 10):
     """
-    with get_db_conn() as conn:
-        with conn.cursor() as cur:
-            cur.executemany(insert_sql, ohlcv)
-        conn.commit()
+    Decorator to retry a function indefinitely on exception, waiting `interval` seconds.
+    """
+    def decorator(fn):
+        @wraps(fn)
+        def wrapped(*args, **kwargs):
+            while True:
+                try:
+                    return fn(*args, **kwargs)
+                except Exception as exc:
+                    logger.error(f"[RETRY] {fn.__name__} failed: {exc}. Retrying in {interval}s…")
+                    sleep(interval)
+        return wrapped
+    return decorator
 
-# --- Binance API Fetch ---
-def fetch_binance_ohlcv(start_ts, end_ts):
-    params = {
-        "symbol": SYMBOL,
-        "interval": INTERVAL,
-        "startTime": int(start_ts.timestamp() * 1000),
-        "endTime": int(end_ts.timestamp() * 1000),
-        "limit": LIMIT,
-    }
-    r = requests.get(BINANCE_API, params=params, timeout=10)
-    r.raise_for_status()
-    data = r.json()
-    ohlcv = []
-    for row in data:
-        ts = datetime.fromtimestamp(row[0] / 1000, tz=timezone.utc)
-        open_, high, low, close, volume = map(float, [row[1], row[2], row[3], row[4], row[5]])
-        ohlcv.append((ts, open_, high, low, close, volume))
-    return ohlcv
 
-def main():
-    logging.info(f"Starting fetch from {START_DATE.date()} to {END_DATE.date()} for {SYMBOL} 1m bars.")
-    current = START_DATE
-    total_minutes = int((END_DATE - START_DATE).total_seconds() // 60)
-    total_chunks = total_minutes // LIMIT + 1
+def load_state() -> Dict[str, str]:
+    """
+    Load last-fetch timestamps from state file (symbol -> ISO timestamp).
+    """
+    try:
+        if STATE_FILE.exists():
+            return json.loads(STATE_FILE.read_text(encoding="utf-8"))
+    except Exception as exc:
+        logger.warning(f"[STATE] Failed to load state: {exc}")
+    return {}
 
-    # Progress bar
-    with tqdm(total=total_chunks, desc="Fetching OHLCV") as pbar:
-        while current < END_DATE:
-            end_chunk = min(current + timedelta(minutes=LIMIT), END_DATE)
-            try:
-                ohlcv = fetch_binance_ohlcv(current, end_chunk)
-                if ohlcv:
-                    save_ohlcv_to_db(ohlcv)
-                    logging.info(f"Fetched and saved {len(ohlcv)} rows: {current} -> {end_chunk}")
-                else:
-                    logging.warning(f"No data fetched for {current} -> {end_chunk}")
-            except Exception as e:
-                logging.error(f"Error for chunk {current} - {end_chunk}: {e}")
-            # Set next chunk start time
-            current = end_chunk
-            pbar.update(1)
-    logging.info("✅ Finished fetching all data.")
+
+def save_state(state: Dict[str, str]) -> None:
+    """
+    Persist last-fetch timestamps to state file.
+    """
+    try:
+        STATE_FILE.parent.mkdir(parents=True, exist_ok=True)
+        STATE_FILE.write_text(json.dumps(state, indent=2), encoding="utf-8")
+    except Exception as exc:
+        logger.error(f"[STATE] Failed to save state: {exc}")
+
+
+def get_symbols_first_dates() -> List[tuple[str, datetime]]:
+    """
+    Fetch all (symbol, first_date) rows from `public.symbols`.
+    """
+    sql = "SELECT symbol, first_date FROM public.symbols;"
+    try:
+        with psycopg2.connect(
+            host=settings.pg_host,
+            port=settings.pg_port,
+            database=settings.pg_db,
+            user=settings.pg_user,
+            password=settings.pg_password,
+        ) as conn:
+            with conn.cursor() as cur:
+                cur.execute(sql)
+                return cur.fetchall()
+    except Exception as exc:
+        logger.error(f"[DB] Error fetching symbols: {exc}")
+        raise DatabaseError(f"Failed to fetch symbols: {exc}")
+
+
+@retry_forever(interval=10)
+def run_ohlcv_backfill() -> None:
+    """
+    Perform backfill for all symbols, saving OHLCV data and tracking progress.
+    """
+    logger.info("[START] OHLCV backfill")
+    now = datetime.now(timezone.utc)
+    state = load_state()
+
+    for symbol, first_dt in get_symbols_first_dates():
+        last_iso = state.get(symbol)
+        start_dt = datetime.fromisoformat(last_iso) if last_iso else first_dt
+
+        if start_dt >= now:
+            logger.info(f"[SKIP] {symbol} up to date (last: {last_iso})")
+            continue
+
+        logger.info(f"[FETCH] {symbol}: {start_dt.isoformat()} → {now.isoformat()}")
+        try:
+            rows = run_full_fetch(symbol=symbol, start=start_dt.isoformat(), end=now.isoformat())
+            save_ohlcv(symbol=symbol, ohlcv=rows)
+        except FetchError as fe:
+            logger.error(f"[FETCH ERROR] {symbol}: {fe}")
+            continue
+        except DatabaseError as de:
+            logger.error(f"[DB ERROR] {symbol}: {de}")
+            continue
+
+        state[symbol] = now.isoformat()
+        save_state(state)
+        logger.info(f"[DONE] {symbol} backfill complete")
+
+    logger.info("[FINISH] All symbols backfilled.")
+
 
 if __name__ == "__main__":
-    main()
+    # Configure a basic console handler if not already configured by CLI entrypoint
+    if not logging.getLogger().handlers:
+        logging.basicConfig(level=logging.INFO)
+    run_ohlcv_backfill()

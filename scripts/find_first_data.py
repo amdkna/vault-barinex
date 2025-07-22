@@ -27,7 +27,7 @@ from config.settings import BINANCE_API_URL, DEFAULT_INTERVAL, PG_CONFIG
 
 # Parameters
 TIMEOUT = 5  # seconds per HTTP request
-TABLE_NAME = sql.Identifier('public', 'symbols')  # schema-qualified
+TABLE_NAME = sql.Identifier("public", "symbols")  # schema-qualified
 
 
 def load_symbols(path=None) -> list:
@@ -43,15 +43,16 @@ def load_symbols(path=None) -> list:
 
 def has_data_for_day(symbol: str, date: datetime.date) -> bool:
     """Return True if Binance has at least one bar for symbol on that UTC date."""
-    day_start = datetime.datetime(date.year, date.month, date.day,
-                                  tzinfo=datetime.timezone.utc)
+    day_start = datetime.datetime(
+        date.year, date.month, date.day, tzinfo=datetime.timezone.utc
+    )
     day_end = day_start + datetime.timedelta(days=1)
     params = {
-        "symbol":    symbol,
-        "interval":  DEFAULT_INTERVAL,
+        "symbol": symbol,
+        "interval": DEFAULT_INTERVAL,
         "startTime": int(day_start.timestamp() * 1000),
-        "endTime":   int(day_end.timestamp() * 1000),
-        "limit":     1,
+        "endTime": int(day_end.timestamp() * 1000),
+        "limit": 1,
     }
     r = requests.get(BINANCE_API_URL, params=params, timeout=TIMEOUT)
     r.raise_for_status()
@@ -59,9 +60,9 @@ def has_data_for_day(symbol: str, date: datetime.date) -> bool:
     return bool(data)
 
 
-def find_first_day(symbol: str,
-                   guess_date: datetime.date,
-                   end_date: datetime.date) -> datetime.date:
+def find_first_day(
+    symbol: str, guess_date: datetime.date, end_date: datetime.date
+) -> datetime.date:
     """Binary-search the earliest UTC date between guess_date…end_date with any data."""
     low, high = 0, (end_date - guess_date).days
     while low < high:
@@ -89,8 +90,11 @@ def upsert_first_date(symbol: str, first_dt: datetime.datetime):
             conn.commit()
     except errors.InsufficientPrivilege as e:
         print(f"Permission error writing to table {TABLE_NAME}: {e}", file=sys.stderr)
-        print("Please grant INSERT, UPDATE privileges:" , file=sys.stderr)
-        print(f"  GRANT INSERT, UPDATE ON TABLE public.symbols TO {PG_CONFIG.get('user')};", file=sys.stderr)
+        print("Please grant INSERT, UPDATE privileges:", file=sys.stderr)
+        print(
+            f"  GRANT INSERT, UPDATE ON TABLE public.symbols TO {PG_CONFIG.get('user')};",
+            file=sys.stderr,
+        )
         sys.exit(1)
     except Exception as e:
         print(f"Unexpected DB error: {e}", file=sys.stderr)
@@ -111,8 +115,8 @@ def main():
         try:
             first_day = find_first_day(sym, guess, today)
             first_dt = datetime.datetime.combine(
-                first_day, datetime.time.min,
-                tzinfo=datetime.timezone.utc)
+                first_day, datetime.time.min, tzinfo=datetime.timezone.utc
+            )
             print(f"→ {sym}: {first_day}")
             upsert_first_date(sym, first_dt)
         except Exception as e:

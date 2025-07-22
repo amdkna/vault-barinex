@@ -1,5 +1,287 @@
 < barinex >
+|    |-- .editorconfig
+|-- .github/
+   |-- workflows/
+      |    |-- ci.yml
 |    |-- .gitignore
+|-- .mypy_cache/
+   |    |-- .gitignore
+   |-- 3.11/
+      |    |-- @plugins_snapshot.json
+      |    |-- _ast.data.json
+      |    |-- _ast.meta.json
+      |    |-- _codecs.data.json
+      |    |-- _codecs.meta.json
+      |    |-- _collections_abc.data.json
+      |    |-- _collections_abc.meta.json
+      |    |-- _thread.data.json
+      |    |-- _thread.meta.json
+      |-- _typeshed/
+         |    |-- __init__.data.json
+         |    |-- __init__.meta.json
+      |    |-- _winapi.data.json
+      |    |-- _winapi.meta.json
+      |    |-- abc.data.json
+      |    |-- abc.meta.json
+      |    |-- adx.data.json
+      |    |-- adx.meta.json
+      |    |-- argparse.data.json
+      |    |-- argparse.meta.json
+      |    |-- array.data.json
+      |    |-- array.meta.json
+      |    |-- builtins.data.json
+      |    |-- builtins.meta.json
+      |    |-- codecs.data.json
+      |    |-- codecs.meta.json
+      |-- collections/
+         |    |-- __init__.data.json
+         |    |-- __init__.meta.json
+         |    |-- abc.data.json
+         |    |-- abc.meta.json
+      |    |-- contextlib.data.json
+      |    |-- contextlib.meta.json
+      |    |-- create_ohlcv_tables.data.json
+      |    |-- create_ohlcv_tables.meta.json
+      |-- ctypes/
+         |    |-- __init__.data.json
+         |    |-- __init__.meta.json
+      |    |-- datetime.data.json
+      |    |-- datetime.meta.json
+      |-- email/
+         |    |-- __init__.data.json
+         |    |-- __init__.meta.json
+         |    |-- charset.data.json
+         |    |-- charset.meta.json
+         |    |-- contentmanager.data.json
+         |    |-- contentmanager.meta.json
+         |    |-- errors.data.json
+         |    |-- errors.meta.json
+         |    |-- header.data.json
+         |    |-- header.meta.json
+         |    |-- message.data.json
+         |    |-- message.meta.json
+         |    |-- policy.data.json
+         |    |-- policy.meta.json
+      |    |-- enum.data.json
+      |    |-- enum.meta.json
+      |    |-- fetch_all.data.json
+      |    |-- fetch_all.meta.json
+      |    |-- genericpath.data.json
+      |    |-- genericpath.meta.json
+      |-- importlib/
+         |    |-- __init__.data.json
+         |    |-- __init__.meta.json
+         |    |-- abc.data.json
+         |    |-- abc.meta.json
+         |    |-- machinery.data.json
+         |    |-- machinery.meta.json
+         |-- metadata/
+            |    |-- __init__.data.json
+            |    |-- __init__.meta.json
+            |    |-- _meta.data.json
+            |    |-- _meta.meta.json
+      |    |-- indicator_evaluator.data.json
+      |    |-- indicator_evaluator.meta.json
+      |    |-- io.data.json
+      |    |-- io.meta.json
+      |-- json/
+         |    |-- __init__.data.json
+         |    |-- __init__.meta.json
+         |    |-- decoder.data.json
+         |    |-- decoder.meta.json
+         |    |-- encoder.data.json
+         |    |-- encoder.meta.json
+      |-- logging/
+         |    |-- __init__.data.json
+         |    |-- __init__.meta.json
+      |    |-- macd.data.json
+      |    |-- macd.meta.json
+      |    |-- mmap.data.json
+      |    |-- mmap.meta.json
+      |    |-- ntpath.data.json
+      |    |-- ntpath.meta.json
+      |    |-- ohlcv_handler.data.json
+      |    |-- ohlcv_handler.meta.json
+      |    |-- operations.data.json
+      |    |-- operations.meta.json
+      |-- os/
+         |    |-- __init__.data.json
+         |    |-- __init__.meta.json
+         |    |-- path.data.json
+         |    |-- path.meta.json
+      |    |-- pathlib.data.json
+      |    |-- pathlib.meta.json
+      |    |-- pickle.data.json
+      |    |-- pickle.meta.json
+      |    |-- posixpath.data.json
+      |    |-- posixpath.meta.json
+      |    |-- re.data.json
+      |    |-- re.meta.json
+      |    |-- rsi.data.json
+      |    |-- rsi.meta.json
+      |    |-- schema.data.json
+      |    |-- schema.meta.json
+      |    |-- settings.data.json
+      |    |-- settings.meta.json
+      |    |-- sre_compile.data.json
+      |    |-- sre_compile.meta.json
+      |    |-- sre_constants.data.json
+      |    |-- sre_constants.meta.json
+      |    |-- sre_parse.data.json
+      |    |-- sre_parse.meta.json
+      |    |-- string.data.json
+      |    |-- string.meta.json
+      |    |-- subprocess.data.json
+      |    |-- subprocess.meta.json
+      |    |-- sys.data.json
+      |    |-- sys.meta.json
+      |    |-- threading.data.json
+      |    |-- threading.meta.json
+      |    |-- time.data.json
+      |    |-- time.meta.json
+      |    |-- types.data.json
+      |    |-- types.meta.json
+      |    |-- typing.data.json
+      |    |-- typing.meta.json
+      |    |-- typing_extensions.data.json
+      |    |-- typing_extensions.meta.json
+   |-- 3.8/
+      |    |-- @plugins_snapshot.json
+      |    |-- _ast.data.json
+      |    |-- _ast.meta.json
+      |    |-- _codecs.data.json
+      |    |-- _codecs.meta.json
+      |    |-- _collections_abc.data.json
+      |    |-- _collections_abc.meta.json
+      |    |-- _thread.data.json
+      |    |-- _thread.meta.json
+      |-- _typeshed/
+         |    |-- __init__.data.json
+         |    |-- __init__.meta.json
+      |    |-- _winapi.data.json
+      |    |-- _winapi.meta.json
+      |    |-- abc.data.json
+      |    |-- abc.meta.json
+      |    |-- argparse.data.json
+      |    |-- argparse.meta.json
+      |    |-- array.data.json
+      |    |-- array.meta.json
+      |    |-- builtins.data.json
+      |    |-- builtins.meta.json
+      |    |-- codecs.data.json
+      |    |-- codecs.meta.json
+      |-- collections/
+         |    |-- __init__.data.json
+         |    |-- __init__.meta.json
+         |    |-- abc.data.json
+         |    |-- abc.meta.json
+      |    |-- contextlib.data.json
+      |    |-- contextlib.meta.json
+      |-- ctypes/
+         |    |-- __init__.data.json
+         |    |-- __init__.meta.json
+      |    |-- datetime.data.json
+      |    |-- datetime.meta.json
+      |-- dotenv/
+         |    |-- __init__.data.json
+         |    |-- __init__.meta.json
+         |    |-- ipython.data.json
+         |    |-- ipython.meta.json
+         |    |-- main.data.json
+         |    |-- main.meta.json
+         |    |-- parser.data.json
+         |    |-- parser.meta.json
+         |    |-- variables.data.json
+         |    |-- variables.meta.json
+      |-- email/
+         |    |-- __init__.data.json
+         |    |-- __init__.meta.json
+         |    |-- charset.data.json
+         |    |-- charset.meta.json
+         |    |-- contentmanager.data.json
+         |    |-- contentmanager.meta.json
+         |    |-- errors.data.json
+         |    |-- errors.meta.json
+         |    |-- header.data.json
+         |    |-- header.meta.json
+         |    |-- message.data.json
+         |    |-- message.meta.json
+         |    |-- policy.data.json
+         |    |-- policy.meta.json
+      |    |-- enum.data.json
+      |    |-- enum.meta.json
+      |    |-- genericpath.data.json
+      |    |-- genericpath.meta.json
+      |-- importlib/
+         |    |-- __init__.data.json
+         |    |-- __init__.meta.json
+         |    |-- abc.data.json
+         |    |-- abc.meta.json
+         |    |-- machinery.data.json
+         |    |-- machinery.meta.json
+         |-- metadata/
+            |    |-- __init__.data.json
+            |    |-- __init__.meta.json
+      |    |-- io.data.json
+      |    |-- io.meta.json
+      |-- json/
+         |    |-- __init__.data.json
+         |    |-- __init__.meta.json
+         |    |-- decoder.data.json
+         |    |-- decoder.meta.json
+         |    |-- encoder.data.json
+         |    |-- encoder.meta.json
+      |-- logging/
+         |    |-- __init__.data.json
+         |    |-- __init__.meta.json
+      |    |-- mmap.data.json
+      |    |-- mmap.meta.json
+      |    |-- ntpath.data.json
+      |    |-- ntpath.meta.json
+      |-- os/
+         |    |-- __init__.data.json
+         |    |-- __init__.meta.json
+         |    |-- path.data.json
+         |    |-- path.meta.json
+      |    |-- pathlib.data.json
+      |    |-- pathlib.meta.json
+      |    |-- pickle.data.json
+      |    |-- pickle.meta.json
+      |    |-- posixpath.data.json
+      |    |-- posixpath.meta.json
+      |    |-- re.data.json
+      |    |-- re.meta.json
+      |    |-- settings.data.json
+      |    |-- settings.meta.json
+      |    |-- shutil.data.json
+      |    |-- shutil.meta.json
+      |    |-- sre_compile.data.json
+      |    |-- sre_compile.meta.json
+      |    |-- sre_constants.data.json
+      |    |-- sre_constants.meta.json
+      |    |-- sre_parse.data.json
+      |    |-- sre_parse.meta.json
+      |    |-- string.data.json
+      |    |-- string.meta.json
+      |    |-- subprocess.data.json
+      |    |-- subprocess.meta.json
+      |    |-- sys.data.json
+      |    |-- sys.meta.json
+      |    |-- tempfile.data.json
+      |    |-- tempfile.meta.json
+      |    |-- threading.data.json
+      |    |-- threading.meta.json
+      |    |-- time.data.json
+      |    |-- time.meta.json
+      |    |-- types.data.json
+      |    |-- types.meta.json
+      |    |-- typing.data.json
+      |    |-- typing.meta.json
+      |    |-- typing_extensions.data.json
+      |    |-- typing_extensions.meta.json
+   |    |-- CACHEDIR.TAG
+   |    |-- missing_stubs
+|    |-- .pre-commit-config.yaml
 |    |-- README.md
 |    |-- clear_logs.bat
 |-- config/
@@ -7,7 +289,6 @@
       |    |-- settings.cpython-311.pyc
       |    |-- settings.cpython-313.pyc
    |    |-- indicator_settings.yml
-   |    |-- settings.py
    |    |-- symbols.yml
 |-- db/
    |-- __pycache__/
@@ -15,11 +296,11 @@
       |    |-- operations.cpython-313.pyc
       |    |-- schema.cpython-311.pyc
       |    |-- schema.cpython-313.pyc
-   |    |-- create_ohlcv_tables.py
-   |    |-- operations.py
-   |    |-- schema.py
 |-- docs/
    |    |-- README_ohlcv_fetcher.md
+   |-- backlist/
+      |    |-- Proposed Project Restructure for barinex.md
+      |    |-- Stepwise Roadmap to Full Standards Compliance.md
    |    |-- first_data_finder.md
    |    |-- indicator_evaluator_doc.md
    |    |-- structure.md
@@ -31,31 +312,52 @@
       |    |-- binance.cpython-313.pyc
    |    |-- binance.py
    |    |-- last_fetch.json
-   |    |-- ohlcv_data_fetcher.py
 |    |-- folder_hierarchy.txt
 |-- indicators/
    |-- __pycache__/
       |    |-- adx.cpython-311.pyc
       |    |-- macd.cpython-311.pyc
       |    |-- rsi.cpython-311.pyc
-   |    |-- adx.py
-   |    |-- macd.py
-   |    |-- rsi.py
 |-- logic/
    |-- __pycache__/
       |    |-- checker.cpython-313.pyc
       |    |-- indicator_evaluator.cpython-311.pyc
       |    |-- ohlcv_handler.cpython-311.pyc
       |    |-- ohlcv_handler.cpython-313.pyc
-   |    |-- indicator_evaluator.py
-   |    |-- ohlcv_handler.py
 |-- logs/
    |    |-- ohlcv_backfill.log
+|    |-- pyproject.toml
+|    |-- requirements-dev.txt
 |    |-- requirements.txt
 |-- scripts/
-   |    |-- evaluate_indicators_at.py
-   |    |-- first_data_finder.py
+   |    |-- find_first_data.py
+|-- setup/
+   |    |-- pre commit config
 |    |-- setup.bat
+|-- src/
+   |-- barinex/
+      |-- config/
+         |    |-- __init__.py
+         |    |-- settings.py
+      |-- db/
+         |    |-- __init__.py
+         |    |-- create_ohlcv_tables.py
+         |    |-- operations.py
+         |    |-- schema.py
+      |-- fetcher/
+         |    |-- __init__.py
+         |    |-- ohlcv_data_fetcher.py
+      |-- indicators/
+         |    |-- __init__.py
+         |    |-- adx.py
+         |    |-- macd.py
+         |    |-- rsi.py
+      |-- services/
+         |    |-- __init__.py
+         |    |-- indicator_evaluator.py
+         |    |-- ohlcv_handler.py
+      |-- utils/
+         |    |-- __init__.py
 |    |-- symbols.yml
 |-- test_scripts/
    |    |-- checker.py
