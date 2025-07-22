@@ -21,3 +21,7 @@ matplotlib==3.8.4                   # If you want to visualize data
 
 # Environment management (optional)
 python-dotenv==1.0.1
+
+pydantic==1.10.2
+requests==2.31.0
+# add any other libraries your code imports, pinned to the latest stable version
